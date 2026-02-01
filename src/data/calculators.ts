@@ -2,6 +2,7 @@ import { Calculator } from '../types';
 import LengthConverter from '../calculators/LengthConverter';
 import AreaOfCircle from '../calculators/AreaOfCircle';
 import BendAllowance from '../calculators/BendAllowance';
+import BendDeduction from '../calculators/BendDeduction';
 
 export const calculators: Calculator[] = [
   {
@@ -24,5 +25,12 @@ export const calculators: Calculator[] = [
     description: 'Compute sheet-metal bend allowance from angle, radius, thickness, and K-factor',
     category: 'fabrication',
     component: BendAllowance,
+  },
+  {
+    id: 'bend-deduction',
+    name: 'Bend Deduction',
+    description: 'Compute bend deduction from angle, radius, thickness, K-factor; shows SB and BA',
+    category: 'fabrication',
+    component: BendDeduction,
   },
 ];
