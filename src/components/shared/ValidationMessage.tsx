@@ -10,7 +10,11 @@ interface ValidationMessageProps {
  * Provides consistent error styling across calculators
  */
 const ValidationMessage: React.FC<ValidationMessageProps> = ({ message }) => {
-  return <Typography color="error">{message}</Typography>;
+  return (
+    <Typography color="error" role="alert">
+      {message}
+    </Typography>
+  );
 };
 
 export default ValidationMessage;
