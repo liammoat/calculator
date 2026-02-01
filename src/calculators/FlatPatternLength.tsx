@@ -204,7 +204,7 @@ const FlatPatternLength: React.FC = () => {
         <Stack spacing={2} sx={{ mt: 2 }}>
           {/* Global inputs */}
           <Box sx={{ display: 'flex', gap: 2 }}>
-            <UnitSelector
+            <UnitSelector<UnitSystem>
               label="Units"
               value={unitSystem}
               options={[
@@ -239,11 +239,11 @@ const FlatPatternLength: React.FC = () => {
               onPresetChange={onPresetChange}
               onKFactorChange={onKFactorChange}
             />
-            <UnitSelector
+            <UnitSelector<'tangent'>
               label="Length Basis"
               value={lengthBasis}
               options={[{ value: 'tangent', label: 'Tangent-to-Tangent (Neutral Axis)' }]}
-              onChange={(value) => setLengthBasis(value as 'tangent')}
+              onChange={setLengthBasis}
               minWidth={200}
             />
           </Box>

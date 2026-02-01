@@ -5,7 +5,7 @@ import ResultCard from '../components/shared/ResultCard';
 import { convertLength, isValidConversionValue, LengthUnit } from '../utils/conversion';
 import { formatNumber, parseNumericInput } from '../utils/formatting';
 
-const UNIT_OPTIONS = [
+const UNIT_OPTIONS: Array<{ value: LengthUnit; label: string }> = [
   { value: 'meters', label: 'Meters' },
   { value: 'feet', label: 'Feet' },
   { value: 'inches', label: 'Inches' },
@@ -39,18 +39,18 @@ const LengthConverter: React.FC = () => {
             onChange={(e) => setInputValue(e.target.value)}
             fullWidth
           />
-          <UnitSelector
+          <UnitSelector<LengthUnit>
             label="From"
             value={fromUnit}
             options={UNIT_OPTIONS}
-            onChange={(value) => setFromUnit(value as LengthUnit)}
+            onChange={setFromUnit}
             fullWidth
           />
-          <UnitSelector
+          <UnitSelector<LengthUnit>
             label="To"
             value={toUnit}
             options={UNIT_OPTIONS}
-            onChange={(value) => setToUnit(value as LengthUnit)}
+            onChange={setToUnit}
             fullWidth
           />
           {inputValue && result && <ResultCard value={result} unit={toUnit} />}

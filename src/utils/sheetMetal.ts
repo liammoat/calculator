@@ -3,6 +3,8 @@
  * Provides pure functions for bend allowance, bend deduction, and related calculations
  */
 
+import { clamp } from './math';
+
 export type UnitSystem = 'mm' | 'in';
 
 export interface BendParameters {
@@ -93,9 +95,4 @@ export function roundByUnit(value: number, unit: UnitSystem): string {
   return value.toFixed(digits);
 }
 
-/**
- * Clamps a value between min and max
- */
-export function clamp(value: number, min: number, max: number): number {
-  return Math.max(min, Math.min(max, value));
-}
+export { clamp };

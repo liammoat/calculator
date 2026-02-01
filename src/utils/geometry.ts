@@ -3,6 +3,8 @@
  * Provides pure functions for geometric calculations
  */
 
+import { clamp } from './math';
+
 export type LengthUnit = 'mm' | 'cm' | 'm' | 'in' | 'ft';
 export type AreaUnit = 'mm²' | 'cm²' | 'm²' | 'in²' | 'ft²';
 
@@ -55,9 +57,4 @@ export function convertArea(value: number, fromUnit: AreaUnit, toUnit: AreaUnit)
   return sqMeters / AREA_TO_SQ_METERS[toUnit];
 }
 
-/**
- * Clamps a value between min and max
- */
-export function clamp(value: number, min: number, max: number): number {
-  return Math.max(min, Math.min(max, value));
-}
+export { clamp };

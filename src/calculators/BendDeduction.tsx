@@ -17,7 +17,7 @@ import {
 } from '../utils/sheetMetal';
 import { parseNumericInput } from '../utils/formatting';
 
-const UNIT_OPTIONS = [
+const UNIT_OPTIONS: Array<{ value: UnitSystem; label: string }> = [
   { value: 'mm', label: 'mm' },
   { value: 'in', label: 'in' },
 ];
@@ -51,8 +51,7 @@ const BendDeduction: React.FC = () => {
   );
 
   // Handle unit toggle with auto-conversion of dimensional inputs
-  const onUnitChange = (next: string) => {
-    const nextUnit = next as UnitSystem;
+  const onUnitChange = (nextUnit: UnitSystem) => {
     setInsideRadius((prev) => {
       const v = parseNumericInput(prev);
       const converted = convertDimension(v, unitSystem, nextUnit);
@@ -120,7 +119,7 @@ const BendDeduction: React.FC = () => {
               onChange={(e) => setAngleDeg(e.target.value)}
               fullWidth
             />
-            <UnitSelector
+            <UnitSelector<UnitSystem>
               label="Units"
               value={unitSystem}
               options={UNIT_OPTIONS}

@@ -26,7 +26,7 @@ import { formatNumber, parseNumericInput } from '../utils/formatting';
 
 type MeasureType = 'radius' | 'diameter';
 
-const LENGTH_UNIT_OPTIONS = [
+const LENGTH_UNIT_OPTIONS: Array<{ value: LengthUnit; label: string }> = [
   { value: 'mm', label: 'mm' },
   { value: 'cm', label: 'cm' },
   { value: 'm', label: 'm' },
@@ -34,7 +34,7 @@ const LENGTH_UNIT_OPTIONS = [
   { value: 'ft', label: 'ft' },
 ];
 
-const AREA_UNIT_OPTIONS = [
+const AREA_UNIT_OPTIONS: Array<{ value: AreaUnit; label: string }> = [
   { value: 'mm²', label: 'mm²' },
   { value: 'cm²', label: 'cm²' },
   { value: 'm²', label: 'm²' },
@@ -110,20 +110,20 @@ const AreaOfCircle: React.FC = () => {
               onChange={(e) => setMeasureValue(e.target.value)}
               fullWidth
             />
-            <UnitSelector
+            <UnitSelector<LengthUnit>
               label="Unit"
               value={inputUnit}
               options={LENGTH_UNIT_OPTIONS}
-              onChange={(value) => setInputUnit(value as LengthUnit)}
+              onChange={setInputUnit}
               minWidth={120}
             />
           </Box>
 
-          <UnitSelector
+          <UnitSelector<AreaUnit>
             label="Output Unit"
             value={outputUnit}
             options={AREA_UNIT_OPTIONS}
-            onChange={(value) => setOutputUnit(value as AreaUnit)}
+            onChange={setOutputUnit}
             minWidth={160}
           />
 
