@@ -13,7 +13,7 @@ const App: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <BrowserRouter>
+      <BrowserRouter basename="/calculator">
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<HomePage />} />

@@ -2,6 +2,8 @@
 
 A mobile-first, responsive web application for various calculations. Built with React, TypeScript, Material UI, and Webpack.
 
+🔗 **Live Demo:** [https://liammoat.github.io/calculator/](https://liammoat.github.io/calculator/)
+
 ## Overview
 
 Calculator is a modular calculator application that allows users to perform various calculations organized by categories. The app features a clean, intuitive interface optimized for mobile devices while maintaining full responsiveness on desktop.
@@ -25,6 +27,7 @@ Calculator is a modular calculator application that allows users to perform vari
 ### Installation
 
 1. Clone the repository:
+
    ```bash
    git clone <repository-url>
    cd calculator
@@ -38,16 +41,19 @@ Calculator is a modular calculator application that allows users to perform vari
 ### Development
 
 Start the development server:
+
 ```bash
 npm start
 ```
 
 This will:
+
 - Start webpack-dev-server on `http://localhost:3000`
 - Open your default browser automatically
 - Enable hot module replacement for instant updates
 
 Alternative command:
+
 ```bash
 npm run dev
 ```
@@ -55,15 +61,33 @@ npm run dev
 ### Production Build
 
 Build the application for production:
+
 ```bash
-npm build
+npm run build
 ```
 
 This creates an optimized production build in the `dist/` directory with:
+
 - Minified and bundled JavaScript
 - Source maps for debugging
 - Code splitting for optimal loading
 - Tree shaking to remove unused code
+
+### Deployment
+
+Deploy to GitHub Pages:
+
+```bash
+npm run deploy
+```
+
+This will:
+
+- Build the production bundle
+- Deploy to the `gh-pages` branch
+- Make the app available at https://liammoat.github.io/calculator/
+
+The app is automatically deployed via GitHub Actions on every push to the `main` branch.
 
 ## Project Structure
 
@@ -118,9 +142,9 @@ import { Card, CardContent, TextField, Typography, Box } from '@mui/material';
 
 const MyCalculator: React.FC = () => {
   const [inputValue, setInputValue] = useState<string>('');
-  
+
   // Your calculation logic here
-  
+
   return (
     <Card>
       <CardContent>
@@ -185,16 +209,19 @@ And update the icon map in `src/components/Layout.tsx` and `src/components/HomeP
 ## Design Principles
 
 ### Mobile-First
+
 - Touch targets are minimum 44x44px
 - Components designed for mobile, then enhanced for desktop
 - Responsive breakpoints: xs (0px), sm (600px), md (960px), lg (1280px), xl (1920px)
 
 ### Simplicity
+
 - Clean, uncluttered interface
 - Focus on the calculator, minimal chrome
 - Clear visual hierarchy
 
 ### Accessibility
+
 - Semantic HTML
 - ARIA labels where appropriate
 - Keyboard navigation support
@@ -211,6 +238,7 @@ And update the icon map in `src/components/Layout.tsx` and `src/components/HomeP
 ## Contributing
 
 When adding new calculators:
+
 1. Follow the existing code style
 2. Use TypeScript types
 3. Test on mobile and desktop
@@ -224,6 +252,7 @@ MIT
 ## Future Enhancements
 
 Potential features for future versions:
+
 - Calculator history
 - Favorites/bookmarks
 - Dark mode
