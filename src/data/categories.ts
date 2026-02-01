@@ -19,4 +19,10 @@ export const categories: Category[] = [
     description: 'Perform mathematical calculations and operations',
     icon: 'Calculate',
   },
+  {
+    id: 'fabrication',
+    name: 'Fabrication',
+    description: 'Sheet-metal bending and flat patterns',
+    icon: 'Build',
+  },
 ];

@@ -1,13 +1,14 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Grid, Card, CardContent, CardActionArea, Typography, Box } from '@mui/material';
-import { SwapHoriz, Straighten, Calculate } from '@mui/icons-material';
+import { SwapHoriz, Straighten, Calculate, Build } from '@mui/icons-material';
 import { categories } from '../data/categories';
 
 const iconMap: { [key: string]: React.ReactElement } = {
   SwapHoriz: <SwapHoriz fontSize="large" />,
   Straighten: <Straighten fontSize="large" />,
   Calculate: <Calculate fontSize="large" />,
+  Build: <Build fontSize="large" />,
 };
 
 const HomePage: React.FC = () => {

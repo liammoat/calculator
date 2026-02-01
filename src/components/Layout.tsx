@@ -24,6 +24,7 @@ import {
   SwapHoriz,
   Straighten,
   Calculate,
+  Build,
 } from '@mui/icons-material';
 import { categories } from '../data/categories';
 import { calculators } from '../data/calculators';
@@ -33,6 +34,7 @@ const iconMap: { [key: string]: React.ReactElement } = {
   SwapHoriz: <SwapHoriz />,
   Straighten: <Straighten />,
   Calculate: <Calculate />,
+  Build: <Build />,
 };
 
 const Layout: React.FC = () => {
