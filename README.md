@@ -1,10 +1,10 @@
-# Engineering Calculator
+# Calculator
 
-A mobile-first, responsive web application for various engineering calculations. Built with React, TypeScript, Material UI, and Webpack.
+A mobile-first, responsive web application for various calculations. Built with React, TypeScript, Material UI, and Webpack.
 
 ## Overview
 
-Engineering Calculator is a modular calculator application that allows users to perform various engineering calculations organized by categories. The app features a clean, intuitive interface optimized for mobile devices while maintaining full responsiveness on desktop.
+Calculator is a modular calculator application that allows users to perform various calculations organized by categories. The app features a clean, intuitive interface optimized for mobile devices while maintaining full responsiveness on desktop.
 
 ## Features
 
@@ -27,7 +27,7 @@ Engineering Calculator is a modular calculator application that allows users to 
 1. Clone the repository:
    ```bash
    git clone <repository-url>
-   cd eng-calc
+   cd calculator
    ```
 
 2. Install dependencies:
@@ -68,7 +68,7 @@ This creates an optimized production build in the `dist/` directory with:
 ## Project Structure
 
 ```
-eng-calc/
+calculator/
 ├── public/
 │   ├── index.html          # HTML template
 │   └── favicon.ico         # App favicon

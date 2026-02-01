@@ -17,7 +17,7 @@ const HomePage: React.FC = () => {
   return (
     <Container maxWidth="lg">
       <Typography variant="h4" gutterBottom>
-        Welcome to Engineering Calculator
+        Welcome to Calculator
       </Typography>
       <Typography variant="body1" color="text.secondary" paragraph>
         Choose a category to get started with your calculations.

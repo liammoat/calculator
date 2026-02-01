@@ -138,7 +138,7 @@ const Layout: React.FC = () => {
             sx={{ flexGrow: 1, cursor: 'pointer' }}
             onClick={() => navigate('/')}
           >
-            Engineering Calculator
+            Calculator
           </Typography>
         </Toolbar>
       </AppBar>
