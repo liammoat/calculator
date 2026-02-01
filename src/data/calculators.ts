@@ -3,6 +3,7 @@ import LengthConverter from '../calculators/LengthConverter';
 import AreaOfCircle from '../calculators/AreaOfCircle';
 import BendAllowance from '../calculators/BendAllowance';
 import BendDeduction from '../calculators/BendDeduction';
+import FlatPatternLength from '../calculators/FlatPatternLength';
 
 export const calculators: Calculator[] = [
   {
@@ -32,5 +33,12 @@ export const calculators: Calculator[] = [
     description: 'Compute bend deduction from angle, radius, thickness, K-factor; shows SB and BA',
     category: 'fabrication',
     component: BendDeduction,
+  },
+  {
+    id: 'flat-pattern-length',
+    name: 'Flat Pattern Length',
+    description: 'Developed length from straight segments and bend allowances (multi-bend)',
+    category: 'fabrication',
+    component: FlatPatternLength,
   },
 ];

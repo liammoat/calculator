@@ -63,7 +63,12 @@ const AreaOfCircle: React.FC = () => {
     return Number.isFinite(parsedValue) && parsedValue >= 0;
   }, [parsedValue]);
 
-  const { radius_m, area_m2, area_out, radius_display } = useMemo(() => {
+  const {
+    radius_m,
+    area_m2: _area_m2,
+    area_out,
+    radius_display,
+  } = useMemo(() => {
     if (!isValid) {
       return {
         radius_m: NaN,

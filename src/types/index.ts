@@ -1,9 +1,10 @@
+import type { ComponentType } from 'react';
 export interface Calculator {
   id: string;
   name: string;
   description: string;
   category: string;
-  component: React.ComponentType;
+  component: ComponentType;
 }
 
 export interface Category {
