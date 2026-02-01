@@ -2,8 +2,6 @@
 
 A mobile-first, responsive web application for various calculations. Built with React, TypeScript, Material UI, and Webpack.
 
-🔗 **Live Demo:** [https://liammoat.github.io/calculator/](https://liammoat.github.io/calculator/)
-
 ## Overview
 
 Calculator is a modular calculator application that allows users to perform various calculations organized by categories. The app features a clean, intuitive interface optimized for mobile devices while maintaining full responsiveness on desktop.
@@ -72,22 +70,6 @@ This creates an optimized production build in the `dist/` directory with:
 - Source maps for debugging
 - Code splitting for optimal loading
 - Tree shaking to remove unused code
-
-### Deployment
-
-Deploy to GitHub Pages:
-
-```bash
-npm run deploy
-```
-
-This will:
-
-- Build the production bundle
-- Deploy to the `gh-pages` branch
-- Make the app available at https://liammoat.github.io/calculator/
-
-The app is automatically deployed via GitHub Actions on every push to the `main` branch.
 
 ## Project Structure
 
