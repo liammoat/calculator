@@ -19,7 +19,7 @@ type KPresetKey = 'none' | 'mildSteel' | 'aluminum' | 'stainless';
 
 const K_PRESETS: Record<KPresetKey, number | null> = {
   none: null,
-  mildSteel: 0.40,
+  mildSteel: 0.4,
   aluminum: 0.33,
   stainless: 0.45,
 };

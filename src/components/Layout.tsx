@@ -15,8 +15,6 @@ import {
   TextField,
   InputAdornment,
   Divider,
-  useTheme,
-  useMediaQuery,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -41,8 +39,6 @@ const Layout: React.FC = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const filteredCalculators = calculators.filter(
     (calc) =>
@@ -95,7 +91,10 @@ const Layout: React.FC = () => {
         </List>
       ) : (
         <>
-          <Typography variant="overline" sx={{ px: 2, mt: 2, display: 'block', color: 'text.secondary' }}>
+          <Typography
+            variant="overline"
+            sx={{ px: 2, mt: 2, display: 'block', color: 'text.secondary' }}
+          >
             Categories
           </Typography>
           <List>

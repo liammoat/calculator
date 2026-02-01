@@ -39,11 +39,19 @@ const Breadcrumbs: React.FC = () => {
   const breadcrumbs = getBreadcrumbs();
 
   return (
-    <MuiBreadcrumbs separator={<NavigateNext fontSize="small" />} aria-label="breadcrumb" sx={{ mb: 2 }}>
+    <MuiBreadcrumbs
+      separator={<NavigateNext fontSize="small" />}
+      aria-label="breadcrumb"
+      sx={{ mb: 2 }}
+    >
       {breadcrumbs.map((crumb, index) => {
         const isLast = index === breadcrumbs.length - 1;
         return isLast ? (
-          <Typography key={crumb.path} color="text.primary" sx={{ display: 'flex', alignItems: 'center' }}>
+          <Typography
+            key={crumb.path}
+            color="text.primary"
+            sx={{ display: 'flex', alignItems: 'center' }}
+          >
             {crumb.icon}
             {crumb.label}
           </Typography>
