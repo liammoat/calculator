@@ -3,47 +3,27 @@ import {
   Card,
   CardContent,
   TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
   Typography,
   Box,
   Stack,
   Button,
-  Divider,
   IconButton,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { AddCircleOutline, RemoveCircleOutline } from '@mui/icons-material';
-
-type UnitSystem = 'mm' | 'in';
-
-type KPresetKey = 'none' | 'mildSteel' | 'aluminum' | 'stainless';
-
-const K_PRESETS: Record<KPresetKey, number | null> = {
-  none: null,
-  mildSteel: 0.4,
-  aluminum: 0.33,
-  stainless: 0.45,
-};
-
-function convertDim(value: number, from: UnitSystem, to: UnitSystem): number {
-  if (!Number.isFinite(value)) return NaN;
-  if (from === to) return value;
-  // mm to in or in to mm using 25.4
-  return from === 'mm' ? value / 25.4 : value * 25.4;
-}
-
-function roundByUnit(value: number, unit: UnitSystem): string {
-  if (!Number.isFinite(value)) return '';
-  const digits = unit === 'mm' ? 3 : 4;
-  return value.toFixed(digits);
-}
-
-function clamp(value: number, min: number, max: number): number {
-  return Math.max(min, Math.min(max, value));
-}
+import {
+  calculateBendAllowance,
+  convertDimension,
+  roundByUnit,
+  UnitSystem,
+  KFactorPresetKey,
+  clamp,
+} from '../utils/sheetMetal';
+import { parseNumericInput } from '../utils/formatting';
+import UnitSelector from '../components/shared/UnitSelector';
+import ResultCard from '../components/shared/ResultCard';
+import ValidationMessage from '../components/shared/ValidationMessage';
+import KFactorInput from '../components/shared/KFactorInput';
 
 type Segment = {
   length: string;
@@ -56,25 +36,28 @@ const FlatPatternLength: React.FC = () => {
   const [unitSystem, setUnitSystem] = useState<UnitSystem>('mm');
   const [thickness, setThickness] = useState<string>('');
   const [defaultInsideRadius, setDefaultInsideRadius] = useState<string>('');
-  const [kPreset, setKPreset] = useState<KPresetKey>('mildSteel');
-  const [kFactor, setKFactor] = useState<string>(String(K_PRESETS.mildSteel));
+  const [kPreset, setKPreset] = useState<KFactorPresetKey>('mildSteel');
+  const [kFactor, setKFactor] = useState<string>('0.4');
   const [lengthBasis, setLengthBasis] = useState<'tangent'>('tangent'); // future: support edge-based
   const [segments, setSegments] = useState<Segment[]>([
     { length: '', angleDeg: '', insideRadius: '' },
   ]);
 
   // Parse global numeric inputs
-  const thicknessVal = useMemo(() => parseFloat(thickness), [thickness]);
-  const defaultRadiusVal = useMemo(() => parseFloat(defaultInsideRadius), [defaultInsideRadius]);
-  const kVal = useMemo(() => parseFloat(kFactor), [kFactor]);
+  const thicknessVal = useMemo(() => parseNumericInput(thickness), [thickness]);
+  const defaultRadiusVal = useMemo(
+    () => parseNumericInput(defaultInsideRadius),
+    [defaultInsideRadius]
+  );
+  const kVal = useMemo(() => parseNumericInput(kFactor), [kFactor]);
 
   // Parse segments
   const parsedSegments = useMemo(
     () =>
       segments.map((s) => ({
-        length: parseFloat(s.length),
-        angleDeg: parseFloat(s.angleDeg),
-        insideRadius: s.insideRadius ? parseFloat(s.insideRadius) : undefined,
+        length: parseNumericInput(s.length),
+        angleDeg: parseNumericInput(s.angleDeg),
+        insideRadius: s.insideRadius ? parseNumericInput(s.insideRadius) : undefined,
       })),
     [segments]
   );
@@ -111,21 +94,21 @@ const FlatPatternLength: React.FC = () => {
   // Unit toggle: convert dimensional inputs
   const onUnitChange = (next: UnitSystem) => {
     setDefaultInsideRadius((prev) => {
-      const v = parseFloat(prev);
-      const converted = Number.isFinite(v) ? convertDim(v, unitSystem, next) : NaN;
+      const v = parseNumericInput(prev);
+      const converted = Number.isFinite(v) ? convertDimension(v, unitSystem, next) : NaN;
       return Number.isFinite(converted) ? String(converted) : prev;
     });
     setThickness((prev) => {
-      const v = parseFloat(prev);
-      const converted = Number.isFinite(v) ? convertDim(v, unitSystem, next) : NaN;
+      const v = parseNumericInput(prev);
+      const converted = Number.isFinite(v) ? convertDimension(v, unitSystem, next) : NaN;
       return Number.isFinite(converted) ? String(converted) : prev;
     });
     setSegments((prev) =>
       prev.map((s) => {
-        const lenNum = parseFloat(s.length);
-        const radNum = s.insideRadius ? parseFloat(s.insideRadius) : NaN;
-        const lenConv = Number.isFinite(lenNum) ? convertDim(lenNum, unitSystem, next) : NaN;
-        const radConv = Number.isFinite(radNum) ? convertDim(radNum, unitSystem, next) : NaN;
+        const lenNum = parseNumericInput(s.length);
+        const radNum = s.insideRadius ? parseNumericInput(s.insideRadius) : NaN;
+        const lenConv = Number.isFinite(lenNum) ? convertDimension(lenNum, unitSystem, next) : NaN;
+        const radConv = Number.isFinite(radNum) ? convertDimension(radNum, unitSystem, next) : NaN;
         return {
           ...s,
           length: Number.isFinite(lenConv) ? String(lenConv) : s.length,
@@ -137,12 +120,12 @@ const FlatPatternLength: React.FC = () => {
   };
 
   // Preset changes prefill kFactor but keep it editable
-  const onPresetChange = (key: KPresetKey) => {
+  const onPresetChange = (key: KFactorPresetKey) => {
     setKPreset(key);
-    const presetVal = K_PRESETS[key];
-    if (presetVal !== null) {
-      setKFactor(String(presetVal));
-    }
+  };
+
+  const onKFactorChange = (value: string) => {
+    setKFactor(value);
   };
 
   const addSegment = () => {
@@ -171,7 +154,6 @@ const FlatPatternLength: React.FC = () => {
       setResults(null);
       return;
     }
-    const toRad = (deg: number) => deg * (Math.PI / 180);
 
     let sumStraight = 0;
     let sumBA = 0;
@@ -183,7 +165,12 @@ const FlatPatternLength: React.FC = () => {
         const Ri = Number.isFinite(s.insideRadius ?? defaultRadiusVal)
           ? (s.insideRadius ?? defaultRadiusVal)
           : 0;
-        const BAi = toRad(s.angleDeg) * (Ri + kVal * thicknessVal);
+        const BAi = calculateBendAllowance({
+          angleDeg: s.angleDeg,
+          insideRadius: Ri,
+          thickness: thicknessVal,
+          kFactor: kVal,
+        });
         sumBA += BAi;
         perBend.push({ index: i + 1, angleDeg: s.angleDeg, R: Ri, BA: BAi });
       }
@@ -217,17 +204,16 @@ const FlatPatternLength: React.FC = () => {
         <Stack spacing={2} sx={{ mt: 2 }}>
           {/* Global inputs */}
           <Box sx={{ display: 'flex', gap: 2 }}>
-            <FormControl sx={{ minWidth: 120 }}>
-              <InputLabel>Units</InputLabel>
-              <Select
-                label="Units"
-                value={unitSystem}
-                onChange={(e) => onUnitChange(e.target.value as UnitSystem)}
-              >
-                <MenuItem value="mm">mm</MenuItem>
-                <MenuItem value="in">in</MenuItem>
-              </Select>
-            </FormControl>
+            <UnitSelector<UnitSystem>
+              label="Units"
+              value={unitSystem}
+              options={[
+                { value: 'mm', label: 'mm' },
+                { value: 'in', label: 'in' },
+              ]}
+              onChange={(value) => onUnitChange(value as UnitSystem)}
+              minWidth={120}
+            />
             <TextField
               label="Thickness"
               type="number"
@@ -247,37 +233,19 @@ const FlatPatternLength: React.FC = () => {
           </Box>
 
           <Box sx={{ display: 'flex', gap: 2 }}>
-            <FormControl sx={{ minWidth: 160 }}>
-              <InputLabel>K-factor Preset</InputLabel>
-              <Select
-                label="K-factor Preset"
-                value={kPreset}
-                onChange={(e) => onPresetChange(e.target.value as KPresetKey)}
-              >
-                <MenuItem value="none">None</MenuItem>
-                <MenuItem value="mildSteel">Mild Steel (0.40)</MenuItem>
-                <MenuItem value="aluminum">Aluminum (0.33)</MenuItem>
-                <MenuItem value="stainless">Stainless (0.45)</MenuItem>
-              </Select>
-            </FormControl>
-            <TextField
-              label="K-factor"
-              type="number"
-              inputProps={{ min: 0, max: 1, step: 'any' }}
-              value={kFactor}
-              onChange={(e) => setKFactor(e.target.value)}
-              fullWidth
+            <KFactorInput
+              presetValue={kPreset}
+              kFactorValue={kFactor}
+              onPresetChange={onPresetChange}
+              onKFactorChange={onKFactorChange}
             />
-            <FormControl sx={{ minWidth: 200 }}>
-              <InputLabel>Length Basis</InputLabel>
-              <Select
-                label="Length Basis"
-                value={lengthBasis}
-                onChange={(e) => setLengthBasis(e.target.value as 'tangent')}
-              >
-                <MenuItem value="tangent">Tangent-to-Tangent (Neutral Axis)</MenuItem>
-              </Select>
-            </FormControl>
+            <UnitSelector<'tangent'>
+              label="Length Basis"
+              value={lengthBasis}
+              options={[{ value: 'tangent', label: 'Tangent-to-Tangent (Neutral Axis)' }]}
+              onChange={setLengthBasis}
+              minWidth={200}
+            />
           </Box>
 
           {/* Segments editor */}
@@ -326,10 +294,7 @@ const FlatPatternLength: React.FC = () => {
           </Box>
 
           {!isValid && hasAnyInput && (
-            <Typography color="error">
-              Ensure thickness &gt; 0, radius ≥ 0 (global or per segment), lengths ≥ 0, angles ∈ [0,
-              180], K ∈ [0, 1].
-            </Typography>
+            <ValidationMessage message="Ensure thickness > 0, radius ≥ 0 (global or per segment), lengths ≥ 0, angles ∈ [0, 180], K ∈ [0, 1]." />
           )}
 
           <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
@@ -340,20 +305,17 @@ const FlatPatternLength: React.FC = () => {
 
           {results && isValid && (
             <Stack spacing={2}>
-              <Card sx={{ bgcolor: 'primary.main', color: 'primary.contrastText' }}>
-                <CardContent>
-                  <Typography variant="h6">Result</Typography>
-                  <Typography variant="h4">
-                    {roundByUnit(results.flatLength, unitSystem)}
-                  </Typography>
-                  <Typography variant="body2">{unitSystem}</Typography>
-                  <Divider sx={{ my: 1, opacity: 0.4 }} />
+              <ResultCard
+                title="Result"
+                value={roundByUnit(results.flatLength, unitSystem)}
+                unit={unitSystem}
+                details={
                   <Typography variant="body2">
                     Sum of straights: {roundByUnit(results.sumStraight, unitSystem)} {unitSystem} |
                     Sum of BA: {roundByUnit(results.sumBA, unitSystem)} {unitSystem}
                   </Typography>
-                </CardContent>
-              </Card>
+                }
+              />
 
               {/* Per-bend contributions */}
               {results.perBend.length > 0 && (
