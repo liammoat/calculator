@@ -1,6 +1,11 @@
 ---
 description: 'Create specifications for new calculator implementations through guided discovery.'
 tools: ['read/readFile', 'edit/createFile', 'edit/editFiles', 'search/fileSearch', 'search/searchResults', 'search/textSearch']
+handoffs: 
+  - label: Start planning
+    agent: Plan
+    prompt: Create an implementation plan for the calculator specification
+    send: false
 ---
 # Calculator Specification Agent
 
