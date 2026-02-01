@@ -395,63 +395,92 @@ const FlatPatternLength: React.FC = () => {
                     height="280"
                   >
                     <g transform="translate(40,200)">
-                      {parsedSegments.map((s, i) => {
-                        const x = parsedSegments
-                          .slice(0, i)
-                          .reduce((acc, prev) => acc + prev.length * (svgParams.scale || 1), 0);
-                        const lenPx = s.length * (svgParams.scale || 1);
-                        const angleRad = s.angleDeg * (Math.PI / 180);
-                        const neutralR =
-                          (Number.isFinite(s.insideRadius ?? defaultRadiusVal)
-                            ? (s.insideRadius ?? defaultRadiusVal)
-                            : 0) +
-                          kVal * thicknessVal;
-                        const rPx = clamp(Math.log10(Math.max(neutralR, 0.1)) * 10 + 20, 15, 60);
-                        return (
-                          <g key={i}>
-                            {/* Straight segment */}
+                      {(() => {
+                        const elems: React.ReactNode[] = [];
+                        // Math coords (y up); convert to SVG by inverting y.
+                        let x = 0;
+                        let y = 0;
+                        let heading = 0; // radians, 0 = right, +CCW
+                        const toRad = (deg: number) => deg * (Math.PI / 180);
+                        parsedSegments.forEach((s, i) => {
+                          const lenPx = (s.length || 0) * (svgParams.scale || 1);
+                          const x2 = x + lenPx * Math.cos(heading);
+                          const y2 = y + lenPx * Math.sin(heading);
+                          // Straight
+                          elems.push(
                             <line
+                              key={`line-${i}`}
                               x1={x}
-                              y1={0}
-                              x2={x + lenPx}
-                              y2={0}
+                              y1={-y}
+                              x2={x2}
+                              y2={-y2}
                               stroke={theme.palette.secondary.main}
                               strokeWidth={2}
                             />
-                            {/* Arc stub to indicate bend */}
-                            {s.angleDeg > 0 && (
+                          );
+                          elems.push(
+                            <text
+                              key={`lenlabel-${i}`}
+                              x={x + (x2 - x) / 2}
+                              y={-y - 8}
+                              fontSize={10}
+                              fill={theme.palette.text.secondary}
+                              textAnchor="middle"
+                            >
+                              {`L${i + 1} = ${s.length}`}
+                            </text>
+                          );
+                          x = x2;
+                          y = y2;
+
+                          if (s.angleDeg > 0) {
+                            const theta = toRad(s.angleDeg);
+                            const neutralR =
+                              (Number.isFinite(s.insideRadius ?? defaultRadiusVal)
+                                ? (s.insideRadius ?? defaultRadiusVal)
+                                : 0) +
+                              kVal * thicknessVal;
+                            const rPx = clamp(
+                              Math.log10(Math.max(neutralR, 0.1)) * 10 + 20,
+                              15,
+                              60
+                            );
+                            // Arc end using circle center derived from tangent
+                            const cx = x - rPx * Math.cos(heading - Math.PI / 2);
+                            const cy = y - rPx * Math.sin(heading - Math.PI / 2);
+                            const end_x = cx + rPx * Math.cos(heading - Math.PI / 2 + theta);
+                            const end_y = cy + rPx * Math.sin(heading - Math.PI / 2 + theta);
+                            elems.push(
                               <path
-                                d={`M ${x + lenPx} 0 A ${rPx} ${rPx} 0 0 1 ${x + lenPx + rPx * Math.sin(angleRad)} ${-rPx * Math.cos(angleRad)}`}
+                                key={`arc-${i}`}
+                                d={`M ${x} ${-y} A ${rPx} ${rPx} 0 0 1 ${end_x} ${-end_y}`}
                                 fill="none"
                                 stroke={theme.palette.secondary.main}
                                 strokeWidth={1.5}
                                 strokeDasharray="4 2"
                               />
-                            )}
-                            {/* Labels */}
-                            <text
-                              x={x + lenPx / 2}
-                              y={-8}
-                              fontSize={10}
-                              fill={theme.palette.text.secondary}
-                              textAnchor="middle"
-                            >
-                              L{i + 1} = {s.length}
-                            </text>
-                            {s.angleDeg > 0 && (
+                            );
+                            const mid_x = cx + rPx * Math.cos(heading - Math.PI / 2 + theta / 2);
+                            const mid_y = cy + rPx * Math.sin(heading - Math.PI / 2 + theta / 2);
+                            elems.push(
                               <text
-                                x={x + lenPx + rPx * Math.sin(angleRad / 2)}
-                                y={-rPx * Math.cos(angleRad / 2) - 10}
+                                key={`angle-${i}`}
+                                x={mid_x}
+                                y={-mid_y - 10}
                                 fontSize={10}
                                 fill={theme.palette.text.primary}
                                 textAnchor="middle"
                               >
-                                θ = {s.angleDeg}°
+                                {`θ = ${s.angleDeg}°`}
                               </text>
-                            )}
-                          </g>
-                        );
-                      })}
+                            );
+                            x = end_x;
+                            y = end_y;
+                            heading += theta;
+                          }
+                        });
+                        return elems;
+                      })()}
                       {/* Overall FL label */}
                       <text
                         x={0}
