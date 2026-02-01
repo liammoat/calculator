@@ -1,5 +1,5 @@
-# Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode,node,web,macos
-# Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,node,web,macos
+# Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode,node,macos
+# Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,node,macos
 
 ### macOS ###
 # General
@@ -193,14 +193,4 @@ dist
 .history
 .ionide
 
-### Web ###
-*.asp
-*.cer
-*.csr
-*.jsp
-*.php
-*.rss
-*.wasm
-*.wat
-
-# End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,node,web,macos
+# End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,node,macos
