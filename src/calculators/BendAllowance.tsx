@@ -11,7 +11,9 @@ import {
   Box,
   Stack,
   Button,
+  Divider,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
 type UnitSystem = 'mm' | 'in';
 
@@ -37,7 +39,12 @@ function roundByUnit(value: number, unit: UnitSystem): string {
   return value.toFixed(digits);
 }
 
+function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value));
+}
+
 const BendAllowance: React.FC = () => {
+  const theme = useTheme();
   const [angleDeg, setAngleDeg] = useState<string>('');
   const [insideRadius, setInsideRadius] = useState<string>('');
   const [thickness, setThickness] = useState<string>('');
@@ -93,6 +100,33 @@ const BendAllowance: React.FC = () => {
     const ba = thetaRad * (radiusVal + kVal * thicknessVal);
     setResult(roundByUnit(ba, unitSystem));
   };
+
+  // SVG visualization parameters
+  const svgParams = useMemo(() => {
+    if (!result || !isValid) {
+      return null;
+    }
+    // Auto-scale based on radius value for readable visualization
+    const baseScale = Math.log10(Math.max(radiusVal, 0.1));
+    const r_inner_px = clamp(40 + baseScale * 10, 30, 80);
+    const t_px = clamp(thicknessVal * (r_inner_px / radiusVal) * 5, 3, 15);
+    const r_outer_px = r_inner_px + t_px;
+    const r_neutral_px = r_inner_px + kVal * t_px;
+
+    return {
+      r_inner_px,
+      r_outer_px,
+      r_neutral_px,
+      t_px,
+      angleRad: angleVal * (Math.PI / 180),
+      angleDeg: angleVal,
+    };
+  }, [result, isValid, radiusVal, thicknessVal, kVal, angleVal]);
+
+  const ariaLabel = useMemo(() => {
+    if (!result || !isValid) return 'Bend allowance visualization: no result';
+    return `Bend allowance visualization: ${angleVal}° bend, inside radius ${insideRadius} ${unitSystem}, thickness ${thickness} ${unitSystem}, K-factor ${kFactor}, bend allowance ${result} ${unitSystem}`;
+  }, [result, isValid, angleVal, insideRadius, thickness, unitSystem, kFactor]);
 
   return (
     <Card>
@@ -179,13 +213,213 @@ const BendAllowance: React.FC = () => {
           </Box>
 
           {result && isValid && (
-            <Card sx={{ bgcolor: 'primary.main', color: 'primary.contrastText' }}>
-              <CardContent>
-                <Typography variant="h6">Result</Typography>
-                <Typography variant="h4">{result}</Typography>
-                <Typography variant="body2">{unitSystem}</Typography>
-              </CardContent>
-            </Card>
+            <Stack spacing={2}>
+              <Card sx={{ bgcolor: 'primary.main', color: 'primary.contrastText' }}>
+                <CardContent>
+                  <Typography variant="h6">Result</Typography>
+                  <Typography variant="h4">{result}</Typography>
+                  <Typography variant="body2">{unitSystem}</Typography>
+                  <Divider sx={{ my: 1, opacity: 0.4 }} />
+                  <Typography variant="body2">
+                    Bend angle: {angleDeg}° | Radius: {insideRadius} {unitSystem} | Thickness:{' '}
+                    {thickness} {unitSystem} | K-factor: {kFactor}
+                  </Typography>
+                </CardContent>
+              </Card>
+
+              {/* SVG Visualization */}
+              {svgParams && (
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    p: 2,
+                    borderRadius: 2,
+                    border: '1px solid',
+                    borderColor: 'divider',
+                  }}
+                >
+                  <svg
+                    role="img"
+                    aria-label={ariaLabel}
+                    viewBox="0 0 320 240"
+                    width="100%"
+                    height="240"
+                  >
+                    <defs>
+                      <marker
+                        id="arrowhead"
+                        markerWidth="10"
+                        markerHeight="10"
+                        refX="9"
+                        refY="3"
+                        orient="auto"
+                      >
+                        <polygon points="0 0, 10 3, 0 6" fill={theme.palette.text.secondary} />
+                      </marker>
+                    </defs>
+                    <g transform="translate(80, 180)">
+                      {/* Straight section before bend */}
+                      <rect
+                        x={-60}
+                        y={-svgParams.r_inner_px - svgParams.t_px}
+                        width={60}
+                        height={svgParams.t_px}
+                        fill={theme.palette.primary.main}
+                        fillOpacity={0.15}
+                        stroke={theme.palette.primary.main}
+                        strokeWidth={1.5}
+                      />
+
+                      {/* Bend center point */}
+                      <circle cx={0} cy={0} r={2} fill={theme.palette.text.secondary} />
+
+                      {/* Inner arc (inside radius) */}
+                      <path
+                        d={`M 0 ${-svgParams.r_inner_px} A ${svgParams.r_inner_px} ${svgParams.r_inner_px} 0 0 1 ${
+                          svgParams.r_inner_px * Math.sin(svgParams.angleRad)
+                        } ${-svgParams.r_inner_px * Math.cos(svgParams.angleRad)}`}
+                        fill="none"
+                        stroke={theme.palette.primary.main}
+                        strokeWidth={1.5}
+                      />
+
+                      {/* Outer arc (outside radius) */}
+                      <path
+                        d={`M 0 ${-svgParams.r_outer_px} A ${svgParams.r_outer_px} ${svgParams.r_outer_px} 0 0 1 ${
+                          svgParams.r_outer_px * Math.sin(svgParams.angleRad)
+                        } ${-svgParams.r_outer_px * Math.cos(svgParams.angleRad)}`}
+                        fill="none"
+                        stroke={theme.palette.primary.main}
+                        strokeWidth={1.5}
+                      />
+
+                      {/* Material fill between arcs */}
+                      <path
+                        d={`M 0 ${-svgParams.r_inner_px} 
+                            A ${svgParams.r_inner_px} ${svgParams.r_inner_px} 0 0 1 ${
+                              svgParams.r_inner_px * Math.sin(svgParams.angleRad)
+                            } ${-svgParams.r_inner_px * Math.cos(svgParams.angleRad)}
+                            L ${svgParams.r_outer_px * Math.sin(svgParams.angleRad)} ${
+                              -svgParams.r_outer_px * Math.cos(svgParams.angleRad)
+                            }
+                            A ${svgParams.r_outer_px} ${svgParams.r_outer_px} 0 0 0 0 ${-svgParams.r_outer_px}
+                            Z`}
+                        fill={theme.palette.primary.main}
+                        fillOpacity={0.15}
+                      />
+
+                      {/* Neutral axis (dashed arc) */}
+                      <path
+                        d={`M 0 ${-svgParams.r_neutral_px} A ${svgParams.r_neutral_px} ${
+                          svgParams.r_neutral_px
+                        } 0 0 1 ${svgParams.r_neutral_px * Math.sin(svgParams.angleRad)} ${
+                          -svgParams.r_neutral_px * Math.cos(svgParams.angleRad)
+                        }`}
+                        fill="none"
+                        stroke={theme.palette.secondary.main}
+                        strokeWidth={2}
+                        strokeDasharray="4 2"
+                      />
+
+                      {/* Inside radius line */}
+                      <line
+                        x1={0}
+                        y1={0}
+                        x2={0}
+                        y2={-svgParams.r_inner_px}
+                        stroke={theme.palette.text.secondary}
+                        strokeWidth={1}
+                        strokeDasharray="2 2"
+                      />
+
+                      {/* Thickness indicator */}
+                      <line
+                        x1={-40}
+                        y1={-svgParams.r_inner_px}
+                        x2={-40}
+                        y2={-svgParams.r_outer_px}
+                        stroke={theme.palette.text.secondary}
+                        strokeWidth={1}
+                        markerEnd="url(#arrowhead)"
+                      />
+                      <line
+                        x1={-40}
+                        y1={-svgParams.r_outer_px}
+                        x2={-40}
+                        y2={-svgParams.r_inner_px}
+                        stroke={theme.palette.text.secondary}
+                        strokeWidth={1}
+                        markerEnd="url(#arrowhead)"
+                      />
+
+                      {/* Angle arc indicator */}
+                      <path
+                        d={`M 0 ${-25} A 25 25 0 0 1 ${25 * Math.sin(svgParams.angleRad)} ${
+                          -25 * Math.cos(svgParams.angleRad)
+                        }`}
+                        fill="none"
+                        stroke={theme.palette.text.secondary}
+                        strokeWidth={1}
+                      />
+
+                      {/* Labels */}
+                      <text
+                        x={-45}
+                        y={-svgParams.r_inner_px - svgParams.t_px / 2}
+                        fontSize={10}
+                        fill={theme.palette.text.primary}
+                        textAnchor="end"
+                      >
+                        T = {thickness} {unitSystem}
+                      </text>
+
+                      <text
+                        x={-8}
+                        y={-svgParams.r_inner_px / 2}
+                        fontSize={10}
+                        fill={theme.palette.text.primary}
+                        textAnchor="end"
+                      >
+                        R = {insideRadius}
+                      </text>
+
+                      <text
+                        x={30 * Math.sin(svgParams.angleRad / 2)}
+                        y={-30 * Math.cos(svgParams.angleRad / 2) + 5}
+                        fontSize={10}
+                        fill={theme.palette.text.primary}
+                        textAnchor="middle"
+                      >
+                        θ = {angleDeg}°
+                      </text>
+
+                      <text
+                        x={svgParams.r_neutral_px * Math.sin(svgParams.angleRad / 2)}
+                        y={-svgParams.r_neutral_px * Math.cos(svgParams.angleRad / 2) - 8}
+                        fontSize={11}
+                        fontWeight="bold"
+                        fill={theme.palette.secondary.main}
+                        textAnchor="middle"
+                      >
+                        BA = {result} {unitSystem}
+                      </text>
+
+                      <text
+                        x={-10}
+                        y={15}
+                        fontSize={9}
+                        fill={theme.palette.text.secondary}
+                        textAnchor="middle"
+                      >
+                        K = {kFactor}
+                      </text>
+                    </g>
+                  </svg>
+                </Box>
+              )}
+            </Stack>
           )}
         </Stack>
       </CardContent>
