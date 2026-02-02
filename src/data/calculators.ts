@@ -1,6 +1,7 @@
 import { Calculator } from '../types';
 import LengthConverter from '../calculators/LengthConverter';
 import AreaOfCircle from '../calculators/AreaOfCircle';
+import Circumference from '../calculators/Circumference';
 import BendAllowance from '../calculators/BendAllowance';
 import BendDeduction from '../calculators/BendDeduction';
 import FlatPatternLength from '../calculators/FlatPatternLength';
@@ -19,6 +20,13 @@ export const calculators: Calculator[] = [
     description: 'Compute circle area from radius or diameter with unit support and visualization',
     category: 'math',
     component: AreaOfCircle,
+  },
+  {
+    id: 'circumference',
+    name: 'Circumference',
+    description: 'Calculates circle circumference from radius (mm) with SVG visualization',
+    category: 'math',
+    component: Circumference,
   },
   {
     id: 'bend-allowance',
