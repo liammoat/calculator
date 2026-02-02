@@ -13,10 +13,11 @@ import {
 
 const LengthConverter: React.FC = () => {
   const [inputValue, setInputValue] = useState<string>('');
-  const [fromUnit, setFromUnit] = useState<string>('meters');
-  const [toUnit, setToUnit] = useState<string>('feet');
+  const [fromUnit, setFromUnit] = useState<string>('mm');
+  const [toUnit, setToUnit] = useState<string>('inches');
 
   const conversionRates: { [key: string]: number } = {
+    mm: 0.001,
     meters: 1,
     feet: 0.3048,
     inches: 0.0254,
@@ -49,6 +50,7 @@ const LengthConverter: React.FC = () => {
           <FormControl fullWidth>
             <InputLabel>From</InputLabel>
             <Select value={fromUnit} onChange={(e) => setFromUnit(e.target.value)} label="From">
+              <MenuItem value="mm">Millimeters</MenuItem>
               <MenuItem value="meters">Meters</MenuItem>
               <MenuItem value="feet">Feet</MenuItem>
               <MenuItem value="inches">Inches</MenuItem>
