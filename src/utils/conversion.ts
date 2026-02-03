@@ -3,12 +3,13 @@
  * Provides pure functions for converting between various units
  */
 
-export type LengthUnit = 'meters' | 'feet' | 'inches' | 'kilometers' | 'miles';
+export type LengthUnit = 'mm' | 'meters' | 'feet' | 'inches' | 'kilometers' | 'miles';
 
 /**
  * Conversion rates to meters for each length unit
  */
 export const LENGTH_CONVERSION_RATES: Record<LengthUnit, number> = {
+  mm: 0.001,
   meters: 1,
   feet: 0.3048,
   inches: 0.0254,

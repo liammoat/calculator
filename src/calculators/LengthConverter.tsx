@@ -6,6 +6,7 @@ import { convertLength, isValidConversionValue, LengthUnit } from '../utils/conv
 import { formatNumber, parseNumericInput } from '../utils/formatting';
 
 const UNIT_OPTIONS: Array<{ value: LengthUnit; label: string }> = [
+  { value: 'mm', label: 'Millimeters' },
   { value: 'meters', label: 'Meters' },
   { value: 'feet', label: 'Feet' },
   { value: 'inches', label: 'Inches' },
@@ -15,8 +16,8 @@ const UNIT_OPTIONS: Array<{ value: LengthUnit; label: string }> = [
 
 const LengthConverter: React.FC = () => {
   const [inputValue, setInputValue] = useState<string>('');
-  const [fromUnit, setFromUnit] = useState<LengthUnit>('meters');
-  const [toUnit, setToUnit] = useState<LengthUnit>('feet');
+  const [fromUnit, setFromUnit] = useState<LengthUnit>('mm');
+  const [toUnit, setToUnit] = useState<LengthUnit>('inches');
 
   const result = useMemo(() => {
     const value = parseNumericInput(inputValue);

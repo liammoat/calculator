@@ -40,6 +40,15 @@ export function calculateCircleArea(radius: number): number {
 }
 
 /**
+ * Calculates the circumference of a circle from radius
+ * Formula: C = 2 × π × r
+ */
+export function calculateCircumference(radius: number): number {
+  if (!Number.isFinite(radius) || radius < 0) return NaN;
+  return 2 * Math.PI * radius;
+}
+
+/**
  * Converts a length value from one unit to another
  */
 export function convertLength(value: number, fromUnit: LengthUnit, toUnit: LengthUnit): number {
